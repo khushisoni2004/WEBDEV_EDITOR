@@ -16,6 +16,7 @@ app.get("/student", (_, res) => res.sendFile(path.join(__dirname, "public", "stu
 app.get("/health", (_, res) => res.json({ ok: true, rooms: rooms.size }));
 
 const rooms = new Map();
+let activeRoomId = "";
 
 const starterCode = () => ({
   html: `<div class="container">
@@ -96,6 +97,7 @@ io.on("connection", socket => {
       locked: false,
       createdAt: Date.now()
     });
+    activeRoomId = roomId;
 
     socket.join(roomId);
     socket.data.role = "teacher";
@@ -117,7 +119,11 @@ io.on("connection", socket => {
     let room = rooms.get(id);
 
     if (!id) {
+      const activeRoom = rooms.get(activeRoomId);
+      room = activeRoom && connectedTeacher(activeRoom) ? activeRoom : null;
+      id = room ? activeRoomId : "";
       for (const [candidateId, candidateRoom] of [...rooms.entries()].reverse()) {
+        if (room) break;
         if (connectedTeacher(candidateRoom)) {
           id = candidateId;
           room = candidateRoom;
@@ -127,7 +133,7 @@ io.on("connection", socket => {
     }
 
     if (!name) return ack({ok:false, message:"Please enter your name."});
-    if (!room) return ack({ok:false, message:"Room not found. Check the room code."});
+    if (!room) return ack({ok:false, message:"No live classroom is open yet. Ask your teacher to create the class first."});
     if (!connectedTeacher(room)) {
       rooms.delete(id);
       return ack({ok:false, message:"Teacher is not connected."});
@@ -245,6 +251,7 @@ io.on("connection", socket => {
     if (!room || socket.data.role !== "teacher" || room.teacher.socketId !== socket.id) return;
     io.to(socket.data.roomId).emit("room-closed", {message: "This live class has ended."});
     rooms.delete(socket.data.roomId);
+    if (activeRoomId === socket.data.roomId) activeRoomId = "";
   });
 
   socket.on("request-student-code", ({socketId} = {}, ack = () => {}) => {
@@ -262,6 +269,7 @@ io.on("connection", socket => {
     if (socket.data.role === "teacher" && room.teacher.socketId === socket.id) {
       io.to(socket.data.roomId).emit("room-closed", {message:"Teacher left the live room."});
       rooms.delete(socket.data.roomId);
+      if (activeRoomId === socket.data.roomId) activeRoomId = "";
       return;
     }
 
