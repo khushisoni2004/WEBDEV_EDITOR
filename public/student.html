@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Student Dashboard | LiveCode</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div id="joinModal" class="modal">
+  <form id="joinForm" class="dialog">
+    <div class="brand"><span class="logo">&lt;/&gt;</span><div><b>LiveCode</b><small>Student Workspace</small></div></div>
+    <h1>Join live classroom</h1>
+    <p>Enter your name and the room code shared by your teacher.</p>
+    <label>Your name<input id="studentName" maxlength="40" placeholder="e.g. Aman Sharma" required></label>
+    <label>Room code<input id="roomInput" maxlength="6" class="room-input" placeholder="ABC123" required></label>
+    <button class="btn primary full" type="submit">Join Classroom</button>
+    <div id="joinError" class="error"></div>
+    <a href="/" class="text-link">← Back home</a>
+  </form>
+</div>
+
+<header class="topbar">
+  <div class="brand"><span class="logo">&lt;/&gt;</span><div><b>LiveCode</b><small>Student Dashboard</small></div></div>
+  <div class="room-box"><span>ROOM</span><b id="roomCode">------</b></div>
+  <div class="header-right"><span id="teacherInfo">Teacher: —</span><span id="connection" class="badge offline">Connecting</span><button id="saveProject" class="btn ghost">💾 Save</button><button id="downloadProject" class="btn ghost">⬇ Download</button><button id="leaveClass" class="btn ghost">Leave Class</button><a class="btn ghost" href="/">Exit</a></div>
+</header>
+
+<main class="student-main">
+  <div class="view-tabs">
+    <button class="view-tab active" data-view="practiceView">My Practice</button>
+    <button class="view-tab" data-view="teacherView">Teacher Live</button>
+  </div>
+
+  <section id="practiceView" class="view active">
+    <div class="toolbar">
+      <div><b>My Web Editor</b><small>Your code is visible to your teacher in real time</small></div>
+      <div class="actions"><label class="check"><input id="autoRun" type="checkbox"> Auto preview</label><button id="runStudent" class="btn secondary">▶ Run</button><button id="clearStudentConsole" class="btn ghost">Clear Output</button><button id="resetStudent" class="btn ghost">Reset</button></div>
+    </div>
+    <div class="code-workspace">
+      <section class="editor-card">
+        <div class="code-tabs">
+          <button class="code-tab active" data-group="mine" data-lang="html">HTML</button>
+          <button class="code-tab" data-group="mine" data-lang="css">CSS</button>
+          <button class="code-tab" data-group="mine" data-lang="js">JavaScript</button>
+        </div>
+        <textarea id="mHtml" class="editor active" spellcheck="false"></textarea>
+        <textarea id="mCss" class="editor" spellcheck="false"></textarea>
+        <textarea id="mJs" class="editor" spellcheck="false"></textarea>
+      </section>
+      <section class="preview-card"><div class="panel-head"><b>My Preview</b><span class="live">● LIVE</span></div><iframe id="mPreview" sandbox="allow-scripts"></iframe><div id="mConsole" class="console"></div></section>
+</div>
+  </section>
+
+  <section id="teacherView" class="view">
+    <div class="toolbar"><div><b id="teacherTitle">Teacher Live Code</b><small>Read-only — updates automatically while teacher types</small></div><span class="badge online">Watching live</span></div>
+    <div class="code-workspace">
+      <section class="editor-card">
+        <div class="code-tabs">
+          <button class="code-tab active" data-group="teacherwatch" data-lang="html">HTML</button>
+          <button class="code-tab" data-group="teacherwatch" data-lang="css">CSS</button>
+          <button class="code-tab" data-group="teacherwatch" data-lang="js">JavaScript</button>
+        </div>
+        <textarea id="wHtml" class="editor watch-editor active" readonly spellcheck="false"></textarea>
+        <textarea id="wCss" class="editor watch-editor" readonly spellcheck="false"></textarea>
+        <textarea id="wJs" class="editor watch-editor" readonly spellcheck="false"></textarea>
+      </section>
+      <section class="preview-card"><div class="panel-head"><b>Teacher Preview</b><span class="live">● LIVE</span></div><iframe id="wPreview" sandbox="allow-scripts"></iframe></section>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/common.js"></script>
+<script src="/js/student.js"></script>
+</body>
+</html>

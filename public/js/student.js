@@ -1,0 +1,25 @@
+const socket=io(); const $=id=>document.getElementById(id); let roomId='', locked=false;
+const mine={html:$('mHtml'),css:$('mCss'),js:$('mJs')}; const watch={html:$('wHtml'),css:$('wCss'),js:$('wJs')};
+const mineCode=()=>Object.fromEntries(Object.entries(mine).map(([key,el])=>[key,el.value]));
+function setMine(code, render=true){Object.entries(mine).forEach(([key,el])=>el.value=code[key]||'');if(render)renderPreview($('mPreview'),code);}
+function setTeacher(code){Object.entries(watch).forEach(([key,el])=>el.value=code[key]||'');renderPreview($('wPreview'),code);}
+function persist(){localStorage.setItem(`codelab:${roomId}`,JSON.stringify(mineCode()));}
+function sendMine(){const code=mineCode();persist();socket.emit('student-code-update',{code});Object.entries(code).forEach(([language,value])=>socket.emit('student-code-change',{language,code:value}));socket.emit('student-activity',{language:activeLanguage('mine')});if($('autoRun').checked)runStudentCode();}
+const sendMineDebounced=debounce(sendMine,220); Object.values(mine).forEach(el=>el.addEventListener('input',sendMineDebounced));
+function runStudentCode(){const fullCode=mineCode();const mode=activeLanguage('mine');const code=modeCode(fullCode,mode);const output=[];if(mode==='js')runCode($('mPreview'),$('mConsole'),code,payload=>output.push(payload));else renderPreview($('mPreview'),code);setTimeout(()=>socket.emit('student-run',{roomId,studentId:socket.id,...fullCode,mode,output,runVersion:Date.now()}),80);}
+$('runStudent').onclick=runStudentCode;
+$('clearStudentConsole').onclick=()=>clearConsole($('mConsole'));
+$('resetStudent').onclick=()=>{if(confirm('Reset your code? Your current changes will be removed.')){setMine(starter);sendMine();}};
+$('roomInput').oninput=e=>e.target.value=e.target.value.toUpperCase();
+$('joinForm').onsubmit=e=>{e.preventDefault();$('joinError').textContent='';socket.emit('join-student',{roomId:$('roomInput').value,studentName:$('studentName').value},res=>{if(!res?.ok){$('joinError').textContent=res?.message||'Unable to join classroom.';return;}roomId=res.roomId;$('roomCode').textContent=roomId;$('teacherInfo').textContent='Teacher: '+res.teacherName;$('teacherTitle').textContent=res.teacherName+' — Live Code';const saved=JSON.parse(localStorage.getItem(`codelab:${roomId}`)||'null');setMine(saved||res.myCode);setTeacher(res.teacherCode);$('joinModal').style.display='none';toast('Joined classroom successfully');});};
+$('saveProject').onclick=()=>{persist();toast('Project saved locally');};
+$('downloadProject').onclick=()=>downloadProject(mineCode(),'student-project');
+$('leaveClass').onclick=()=>{if(confirm('Leave this classroom?'))location.href='/';};
+socket.on('teacher-code-update',({teacherName,code})=>{$('teacherInfo').textContent='Teacher: '+teacherName;$('teacherTitle').textContent=teacherName+' — Live Code';setTeacher(code);});
+socket.on('practice-lock',({locked:value})=>{locked=value;Object.values(mine).forEach(el=>el.readOnly=locked);toast(locked?'Teacher paused practice':'Practice resumed');});
+socket.on('announcement',({message})=>toast('Teacher: '+message));
+socket.on('teacher-focus',({focused})=>{if(focused){document.querySelector('[data-view="teacherView"]').click();toast('Teacher focus mode is on');}});
+socket.on('room-closed',({message})=>{alert(message||'Live room ended.');location.href='/';});
+socket.on('connect',()=>{$('connection').textContent='● Connected';$('connection').className='badge online';});
+socket.on('disconnect',()=>{$('connection').textContent='Reconnecting';$('connection').className='badge offline';});
+attachConsole($('mPreview'),$('mConsole'));

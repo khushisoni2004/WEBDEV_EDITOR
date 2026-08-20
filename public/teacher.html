@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teacher Dashboard | LiveCode</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div id="startModal" class="modal">
+  <form id="startForm" class="dialog">
+    <div class="brand"><span class="logo">&lt;/&gt;</span><div><b>LiveCode</b><small>Teacher Console</small></div></div>
+    <h1>Start a live class</h1>
+    <p>Create a room and share the six-character code with students.</p>
+    <label>Your name<input id="teacherName" maxlength="40" placeholder="e.g. Khushi Ma'am" required></label>
+    <label>Class title<input id="classTitle" maxlength="80" placeholder="e.g. DOM & Events"></label>
+    <button class="btn primary full" type="submit">Create Live Room</button>
+    <a href="/" class="text-link">← Back home</a>
+  </form>
+</div>
+
+<header class="topbar">
+  <div class="brand"><span class="logo">&lt;/&gt;</span><div><b>LiveCode</b><small>Teacher Dashboard</small></div></div>
+  <div class="room-box"><span>ROOM</span><b id="roomCode">------</b><button id="copyCode" class="icon-btn">⧉</button></div>
+  <div class="header-right"><span id="connection" class="badge offline">Connecting</span><span id="studentCount">0 students</span><button id="announce" class="btn ghost">Send Message</button><button id="lockPractice" class="btn ghost">Lock Practice</button><button id="endClass" class="btn ghost">End Class</button><a class="btn ghost" href="/">Exit</a></div>
+</header>
+
+<div class="teacher-layout">
+  <aside class="sidebar">
+    <div class="side-title"><div><span class="eyebrow">CLASSROOM</span><h3>Students</h3></div><span id="sideCount" class="count">0</span></div>
+    <input id="studentSearch" class="search" placeholder="Search students...">
+    <div id="students" class="students"><div class="empty">👥<p>Students will appear here.</p></div></div>
+  </aside>
+
+  <main class="main">
+    <div class="view-tabs">
+      <button class="view-tab active" data-view="teachView">My Live Code</button>
+      <button class="view-tab" data-view="monitorView">Student Monitor</button>
+    </div>
+
+    <section id="teachView" class="view active">
+      <div class="toolbar">
+        <div><b>Teaching Workspace</b><small>Changes sync to all students automatically</small></div>
+        <div class="actions"><label class="check"><input id="autoRun" type="checkbox"> Auto preview</label><button id="runTeacher" class="btn secondary">▶ Run</button><button id="clearTeacherConsole" class="btn ghost">Clear Output</button><button id="resetTeacher" class="btn ghost">Reset</button><button id="downloadTeacher" class="btn ghost">⬇ Download</button><button id="focusMode" class="btn ghost">Focus Mode</button></div>
+      </div>
+      <div class="code-workspace">
+        <section class="editor-card">
+          <div class="code-tabs">
+            <button class="code-tab active" data-group="teacher" data-lang="html">HTML</button>
+            <button class="code-tab" data-group="teacher" data-lang="css">CSS</button>
+            <button class="code-tab" data-group="teacher" data-lang="js">JavaScript</button>
+          </div>
+          <textarea id="tHtml" class="editor active" spellcheck="false"></textarea>
+          <textarea id="tCss" class="editor" spellcheck="false"></textarea>
+          <textarea id="tJs" class="editor" spellcheck="false"></textarea>
+        </section>
+        <section class="preview-card"><div class="panel-head"><b>Live Preview</b><span class="live">● LIVE</span></div><iframe id="tPreview" sandbox="allow-scripts"></iframe><div id="tConsole" class="console"></div></section>
+      </div>
+    </section>
+
+    <section id="monitorView" class="view">
+      <div id="monitorEmpty" class="empty big">🧑‍💻<h2>Select a student</h2><p>Click a connected student from the left side to inspect their live code.</p></div>
+      <div id="monitorContent" class="hidden">
+        <div class="toolbar"><div><b id="selectedName">Student</b><small>Read-only live workspace</small></div><span class="badge online">Live sync</span></div>
+        <div class="code-workspace">
+          <section class="editor-card">
+            <div class="code-tabs">
+              <button class="code-tab active" data-group="student" data-lang="html">HTML</button>
+              <button class="code-tab" data-group="student" data-lang="css">CSS</button>
+              <button class="code-tab" data-group="student" data-lang="js">JavaScript</button>
+            </div>
+            <textarea id="sHtml" class="editor student-editor active" readonly spellcheck="false"></textarea>
+            <textarea id="sCss" class="editor student-editor" readonly spellcheck="false"></textarea>
+            <textarea id="sJs" class="editor student-editor" readonly spellcheck="false"></textarea>
+          </section>
+          <section class="preview-card"><div class="panel-head"><b>Student Last Run</b><span class="live">● WATCHING</span></div><iframe id="sPreview" sandbox="allow-scripts"></iframe><div id="sConsole" class="console"></div></section>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/common.js"></script>
+<script src="/js/teacher.js"></script>
+</body>
+</html>
