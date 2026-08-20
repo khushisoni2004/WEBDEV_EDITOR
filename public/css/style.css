@@ -1,12 +1,12 @@
 *{box-sizing:border-box}
-:root{--bg:#0b1020;--panel:#11182b;--panel2:#151e34;--line:#27324d;--text:#edf2ff;--muted:#94a3b8;--accent:#7c3aed;--accent2:#4f46e5;--green:#22c55e;--red:#ef4444;--code:#0a0f1c}
-body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#080d18;color:var(--text);min-height:100vh}
+:root{--bg:#080d18;--panel:#11182b;--panel2:#151e34;--line:#27324d;--text:#edf2ff;--muted:#94a3b8;--accent:#7c3aed;--accent2:#4f46e5;--brand-blue:#5267ff;--green:#22c55e;--red:#ef4444;--code:#080d18}
+body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 80% -10%,#312e8133,transparent 32%),#080d18;color:var(--text);min-height:100vh}
 a{text-decoration:none;color:inherit}
 button,input,textarea{font:inherit}
 button{cursor:pointer}
-.brand{display:flex;align-items:center;gap:11px}.brand .logo{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#2563eb);font-weight:900}.brand div{display:flex;flex-direction:column}.brand small,.toolbar small{color:var(--muted);margin-top:2px}
+.brand{display:flex;align-items:center;gap:11px}.brand div{display:flex;flex-direction:column}.brand b{letter-spacing:-.02em}.brand small,.toolbar small{color:var(--muted);margin-top:2px}.logo-mark{position:relative;display:block;width:42px;height:42px;flex:0 0 42px;border-radius:13px;background:linear-gradient(145deg,#ffffff,#e9edff);border:1px solid #dbe2f3;box-shadow:0 7px 18px #0003}.logo-mark::before{content:"";position:absolute;left:11px;top:8px;width:19px;height:24px;border:6px solid #6636d8;border-left-width:7px;border-radius:8px 13px 13px 8px;transform:skewY(29deg) rotate(-1deg)}.logo-mark::after{content:"";position:absolute;left:18px;top:14px;width:0;height:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-left:14px solid #6875ff;filter:drop-shadow(-5px 4px 0 #7b35d8)}.brand-hero .logo-mark{width:88px;height:88px;flex-basis:88px;border-radius:27px}.brand-hero .logo-mark::before{left:24px;top:17px;transform:scale(1.7) skewY(29deg)}.brand-hero .logo-mark::after{left:38px;top:30px;transform:scale(1.7)}
 .eyebrow{font-size:11px;letter-spacing:.15em;color:#a5b4fc;font-weight:800}
-.landing{background:radial-gradient(circle at 20% 20%,#312e8155,transparent 35%),radial-gradient(circle at 85% 65%,#0f766e33,transparent 30%),#080d18}
+.landing{background:radial-gradient(circle at 20% 20%,#5267ff40,transparent 35%),radial-gradient(circle at 85% 65%,#7c3aed2e,transparent 30%),#080d18}
 .landing-wrap{min-height:100vh;display:grid;place-items:center;padding:35px}.hero{width:min(1050px,100%);padding:44px;border:1px solid var(--line);border-radius:28px;background:#0d1424dd;box-shadow:0 30px 80px #0006}.hero>.eyebrow{display:inline-block;margin-top:55px}.hero h1{font-size:clamp(42px,7vw,78px);line-height:.98;margin:14px 0 20px;letter-spacing:-.05em}.hero>p{max-width:720px;color:#b6c2d6;font-size:18px;line-height:1.65}
 .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:36px}.role{border:1px solid var(--line);border-radius:22px;padding:25px;background:#11192c;transition:.2s}.role:hover{transform:translateY(-4px);border-color:#6d5ce7}.role h2{margin:12px 0 8px}.role p{color:var(--muted);min-height:48px}.role b{color:#c4b5fd}.big-icon{font-size:34px}
 .topbar{height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--line);background:#0d1424;position:sticky;top:0;z-index:5}.room-box{display:flex;align-items:center;gap:9px;background:#151e34;border:1px solid var(--line);padding:8px 13px;border-radius:12px}.room-box span{font-size:10px;color:var(--muted);letter-spacing:.12em}.room-box b{letter-spacing:.18em;color:#c4b5fd}.header-right{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:14px}
@@ -22,7 +22,9 @@ button{cursor:pointer}
 @media(max-width:640px){
   body{overflow-x:hidden}
   .topbar{height:auto;min-height:64px;padding:10px 12px;gap:10px;flex-wrap:wrap;position:relative}
-  .topbar .brand .logo{width:34px;height:34px;border-radius:9px}
+  .topbar .brand .logo-mark{width:34px;height:34px;flex-basis:34px;border-radius:9px}
+  .topbar .brand .logo-mark::before{left:9px;top:7px;transform:scale(.8) skewY(29deg)}
+  .topbar .brand .logo-mark::after{left:15px;top:11px;transform:scale(.8)}
   .topbar .brand b{font-size:14px}
   .room-box{margin-left:auto;padding:6px 9px}
   .header-right{width:100%;overflow-x:auto;justify-content:flex-start;gap:7px;padding-bottom:2px;white-space:nowrap}
