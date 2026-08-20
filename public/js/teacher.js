@@ -9,7 +9,7 @@ const setTeacherCode = code => { Object.entries(teacherEditors).forEach(([key, e
 const setStudentCode = code => { Object.entries(studentEditors).forEach(([key, el]) => el.value = code[key] || ''); };
 const sendTeacherCode = debounce(() => { const code = teacherCode(); socket.emit('teacher-code-update', {code}); if ($('autoRun').checked) runTeacherCode(); }, 220);
 Object.values(teacherEditors).forEach(el => el.addEventListener('input', sendTeacherCode));
-$('startForm').addEventListener('submit', event => { event.preventDefault(); socket.emit('create-room', {teacherName:$('teacherName').value, classTitle:$('classTitle').value}, res => { if (!res?.ok) return toast('Could not create room.'); roomId=res.roomId; $('roomCode').textContent=roomId; setTeacherCode(res.teacherCode); $('startModal').style.display='none'; toast(`${res.classTitle} created`); }); });
+$('startForm').addEventListener('submit', event => { event.preventDefault(); socket.emit('create-room', {teacherName:$('teacherName').value, password:$('teacherPassword').value, classTitle:$('classTitle').value}, res => { if (!res?.ok) return toast(res?.message || 'Could not create room.'); roomId=res.roomId; $('roomCode').textContent=roomId; setTeacherCode(res.teacherCode); $('startModal').style.display='none'; toast(`${res.classTitle} created`); }); });
 $('copyCode').addEventListener('click', async () => { try { await navigator.clipboard.writeText(roomId); toast('Room code copied'); } catch { toast(roomId); } });
 function runTeacherCode(){
   const fullCode = teacherCode();

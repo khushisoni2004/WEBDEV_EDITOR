@@ -8,6 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { maxHttpBufferSize: 1e6 });
 const PORT = process.env.PORT || 9001;
+const TEACHER_PASSWORD = process.env.TEACHER_PASSWORD || "CODEPATH";
 
 app.use(express.static(path.join(__dirname, "public")));
 app.get("/teacher", (_, res) => res.sendFile(path.join(__dirname, "public", "teacher.html")));
@@ -81,7 +82,10 @@ function studentsFor(room) {
 }
 
 io.on("connection", socket => {
-  socket.on("create-room", ({teacherName, classTitle} = {}, ack = () => {}) => {
+  socket.on("create-room", ({teacherName, classTitle, password} = {}, ack = () => {}) => {
+    if (String(password || "").trim().toUpperCase() !== TEACHER_PASSWORD.toUpperCase()) {
+      return ack({ok:false, message:"Incorrect teacher password."});
+    }
     const name = String(teacherName || "Teacher").trim().slice(0, 40) || "Teacher";
     const roomId = newRoomId();
 
@@ -108,9 +112,19 @@ io.on("connection", socket => {
   });
 
   socket.on("join-student", ({roomId, studentName} = {}, ack = () => {}) => {
-    const id = String(roomId || "").trim().toUpperCase();
+    let id = String(roomId || "").trim().toUpperCase();
     const name = String(studentName || "").trim().slice(0, 40);
-    const room = rooms.get(id);
+    let room = rooms.get(id);
+
+    if (!id) {
+      for (const [candidateId, candidateRoom] of [...rooms.entries()].reverse()) {
+        if (connectedTeacher(candidateRoom)) {
+          id = candidateId;
+          room = candidateRoom;
+          break;
+        }
+      }
+    }
 
     if (!name) return ack({ok:false, message:"Please enter your name."});
     if (!room) return ack({ok:false, message:"Room not found. Check the room code."});
