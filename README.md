@@ -1,89 +1,63 @@
 # CodePath LiveLab
 
-A real-time HTML/CSS/JavaScript teaching editor for live web-development classes.
+Real-time HTML, CSS and JavaScript classroom compiler for teachers and students.
+
+## Live App
+
+- **Home:** https://codepath-livelab-production.up.railway.app
+- **Teacher:** https://codepath-livelab-production.up.railway.app/teacher
+- **Student:** https://codepath-livelab-production.up.railway.app/student
+- **Health:** https://codepath-livelab-production.up.railway.app/health
+- **GitHub:** https://github.com/khushisoni2004/WEBDEV_EDITOR
 
 ## Features
-- Teacher creates a 6-character live room
-- Students join using room code + name
+
+- Teacher-created rooms with shareable codes
 - Separate HTML, CSS and JavaScript editors
-- Live browser preview using iframe `srcdoc`
-- Teacher code broadcasts to every student in real time
-- Every student's code is sent live to the teacher
-- Teacher can click any online student and inspect their code + preview
-- Online student list and disconnect handling
-- Responsive dark dashboard UI
-- Live activity, search, announcements, focus mode, practice lock, console capture, local autosave and project download
+- Instant sandboxed browser preview and console output
+- Live teacher code broadcast to all students
+- Live student code and last-run output monitoring
+- Responsive mobile-friendly student workspace
+- Save, reset, download, announcements, focus mode and practice lock
 
-## Tech Stack
-- HTML
-- CSS
-- Vanilla JavaScript
-- Node.js
-- Express
-- Socket.IO / WebSockets
+## Run Locally
 
-## Run locally
-
-Install Node.js 18 or newer.
+Requires Node.js 18+.
 
 ```bash
+git clone https://github.com/khushisoni2004/WEBDEV_EDITOR.git
+cd WEBDEV_EDITOR
 npm install
 npm start
 ```
 
-Open:
+Open `http://localhost:9001`.
 
-```text
-http://localhost:3000
+- Teacher: `http://localhost:9001/teacher`
+- Student: `http://localhost:9001/student`
+
+Set a different port with `.env`:
+
+```env
+PORT=9001
 ```
 
-Teacher:
-```text
-http://localhost:3000/teacher
-```
+## Classroom Test
 
-Student:
-```text
-http://localhost:3000/student
-```
+1. Open Teacher and create a room.
+2. Copy the six-character room code.
+3. Open Student in another browser or phone.
+4. Join with the student name and room code.
+5. Type code and click **Run** to test live sync and output.
 
-For testing on one laptop:
-1. Open Teacher page and create a room.
-2. Copy the room code.
-3. Open Student page in another browser/incognito tab.
-4. Join with a student name + room code.
-5. Type in either editor and watch the live synchronization.
+## Deployment
 
-## Use on multiple devices in the same Wi-Fi/LAN
-Run the server on the teacher computer and find its local IP address, for example `192.168.1.10`.
-Students can open:
-
-```text
-http://192.168.1.10:3000/student
-```
-
-Your OS firewall must allow incoming traffic on port 3000.
-
-Optional `.env` values:
-```text
-PORT=3000
-MONGODB_URI=mongodb://127.0.0.1:27017/codepath-livelab
-```
-
-Classroom state is held in memory for live isolation. Student projects autosave to local storage and download as `index.html`, `style.css`, and `script.js`.
-
-## Deploy online
-This is a Node.js app and needs a host that supports long-running Node servers/WebSockets, such as Render, Railway, Fly.io, VPS, etc.
-
-Build command:
-```text
-npm install
-```
+The app requires a long-running Node.js server with WebSocket support. Railway is configured for the live deployment above.
 
 Start command:
-```text
+
+```bash
 npm start
 ```
 
-## Important security note
-Student/teacher JavaScript preview is placed in a sandboxed iframe. This demo is appropriate for classroom practice, but a production platform should add authentication, persistent database storage, rate limiting, room passwords, stronger content/security policies, audit logging, and possibly a separate isolated code-execution environment.
+Live classroom state is kept in memory; student drafts are saved locally in the browser.
