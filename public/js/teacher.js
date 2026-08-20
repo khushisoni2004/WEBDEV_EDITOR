@@ -16,9 +16,22 @@ function runTeacherCode(){
   const mode = activeLanguage('teacher');
   const code = modeCode(fullCode, mode);
   const output = [];
-  if (mode === 'js') runCode($('tPreview'), $('tConsole'), code, payload => output.push(payload));
-  else { clearConsole($('tConsole')); renderPreview($('tPreview'), code); }
-  setTimeout(() => socket.emit('teacher-run', { ...fullCode, mode, output, runVersion: Date.now() }), 100);
+  const runVersion = Date.now();
+  let sent = false;
+  const publishRun = () => {
+    if (sent) return;
+    sent = true;
+    socket.emit('teacher-run', { ...fullCode, mode, output, runVersion });
+  };
+  if (mode === 'js') {
+    $('tPreview').addEventListener('load', () => setTimeout(publishRun, 160), { once: true });
+    runCode($('tPreview'), $('tConsole'), code, payload => output.push(payload));
+    setTimeout(publishRun, 900);
+  } else {
+    clearConsole($('tConsole'));
+    renderPreview($('tPreview'), code);
+    publishRun();
+  }
 }
 $('runTeacher').addEventListener('click', runTeacherCode);
 $('clearTeacherConsole').addEventListener('click', () => clearConsole($('tConsole')));
