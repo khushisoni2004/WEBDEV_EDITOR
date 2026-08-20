@@ -1,34 +1,4 @@
-const starter = {
-  html: `<main class="card">
-  <h1>Hello Web Developers 👋</h1>
-  <p>Edit HTML, CSS and JavaScript and see the output live.</p>
-  <button id="helloBtn">Click Me</button>
-</main>`,
-  css: `body {
-  margin: 0;
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  font-family: Arial, sans-serif;
-  background: #eef2ff;
-}
-.card {
-  width: min(520px, 85%);
-  padding: 30px;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 18px 45px rgba(0,0,0,.12);
-}
-button {
-  padding: 10px 18px;
-  border: 0;
-  border-radius: 10px;
-  cursor: pointer;
-}`,
-  js: `document.getElementById("helloBtn")?.addEventListener("click", () => {
-  alert("JavaScript is working!");
-});`
-};
+const starter = { html: "", css: "", js: "" };
 
 function buildDocument(code) {
   const js = String(code.js || "").replace(/<\/script/gi, "<\\/script");

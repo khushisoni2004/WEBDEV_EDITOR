@@ -18,37 +18,7 @@ app.get("/health", (_, res) => res.json({ ok: true, rooms: rooms.size }));
 const rooms = new Map();
 let activeRoomId = "";
 
-const starterCode = () => ({
-  html: `<div class="container">
-  <h1>Hello Web Developers 👋</h1>
-  <p>Start editing your HTML, CSS and JavaScript.</p>
-  <button id="btn">Click Me</button>
-</div>`,
-  css: `body {
-  margin: 0;
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  font-family: Arial, sans-serif;
-  background: #f4f7fb;
-}
-.container {
-  width: min(500px, 85%);
-  padding: 30px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0,0,0,.1);
-}
-button {
-  padding: 10px 18px;
-  border: 0;
-  border-radius: 10px;
-  cursor: pointer;
-}`,
-  js: `document.getElementById("btn")?.addEventListener("click", () => {
-  alert("JavaScript is working!");
-});`
-});
+const starterCode = () => ({ html: "", css: "", js: "" });
 
 function cleanCode(code = {}) {
   return {
