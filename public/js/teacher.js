@@ -11,7 +11,15 @@ const sendTeacherCode = debounce(() => { const code = teacherCode(); socket.emit
 Object.values(teacherEditors).forEach(el => el.addEventListener('input', sendTeacherCode));
 $('startForm').addEventListener('submit', event => { event.preventDefault(); socket.emit('create-room', {teacherName:$('teacherName').value, classTitle:$('classTitle').value}, res => { if (!res?.ok) return toast('Could not create room.'); roomId=res.roomId; $('roomCode').textContent=roomId; setTeacherCode(res.teacherCode); $('startModal').style.display='none'; toast(`${res.classTitle} created`); }); });
 $('copyCode').addEventListener('click', async () => { try { await navigator.clipboard.writeText(roomId); toast('Room code copied'); } catch { toast(roomId); } });
-function runTeacherCode(){ const code = modeCode(teacherCode(), activeLanguage('teacher')); if (activeLanguage('teacher') === 'js') runCode($('tPreview'), $('tConsole'), code); else renderPreview($('tPreview'), code); }
+function runTeacherCode(){
+  const fullCode = teacherCode();
+  const mode = activeLanguage('teacher');
+  const code = modeCode(fullCode, mode);
+  const output = [];
+  if (mode === 'js') runCode($('tPreview'), $('tConsole'), code, payload => output.push(payload));
+  else { clearConsole($('tConsole')); renderPreview($('tPreview'), code); }
+  setTimeout(() => socket.emit('teacher-run', { ...fullCode, mode, output, runVersion: Date.now() }), 100);
+}
 $('runTeacher').addEventListener('click', runTeacherCode);
 $('clearTeacherConsole').addEventListener('click', () => clearConsole($('tConsole')));
 $('resetTeacher').addEventListener('click', () => { if (!confirm('Reset your teaching code?')) return; setTeacherCode(starter); socket.emit('teacher-code-update',{code:starter}); });
@@ -30,7 +38,8 @@ socket.on('disconnect',()=>{ $('connection').textContent='Reconnecting'; $('conn
 socket.on('student-list',list=>{allStudents=list; renderStudents();});
 socket.on('student-code-update',data=>{const previous=studentCache.get(data.socketId)||{};studentCache.set(data.socketId,{...previous,name:data.name,code:data.code,lastRun:data.lastRun||previous.lastRun}); if(data.socketId===selectedStudentId) showSelected(data.socketId,data.name,data.code,data.lastRun||previous.lastRun);});
 socket.on('student-code-change',data=>{const previous=studentCache.get(data.socketId)||{name:data.name,code:{html:'',css:'',js:''}};const code={...previous.code,[data.language]:data.code};studentCache.set(data.socketId,{...previous,name:data.name,code});if(data.socketId===selectedStudentId){setStudentCode(code);$('selectedName').textContent=`${data.name} Workspace · ${data.language.toUpperCase()} typing`;}});
-socket.on('student-run',data=>{const previous=studentCache.get(data.socketId)||{};studentCache.set(data.socketId,{...previous,name:data.name,code:{html:data.html,css:data.css,js:data.js},lastRun:data});if(data.socketId===selectedStudentId){setStudentCode({html:data.html,css:data.css,js:data.js});const previewCode=modeCode(data,data.mode || 'html');if(data.mode === 'js')runCode($('sPreview'),$('sConsole'),previewCode);else renderPreview($('sPreview'),previewCode);toast(`${data.name} ran ${data.mode || 'HTML'}`);}});
+socket.on('student-run',data=>{const previous=studentCache.get(data.socketId)||{};studentCache.set(data.socketId,{...previous,name:data.name,code:{html:data.html,css:data.css,js:data.js},lastRun:data});if(data.socketId===selectedStudentId){setStudentCode({html:data.html,css:data.css,js:data.js});const previewCode=modeCode(data,data.mode || 'html');if(data.mode === 'js'){runCode($('sPreview'),$('sConsole'),previewCode);setTimeout(()=>renderCapturedOutput($('sConsole'),data.output),120);}else{clearConsole($('sConsole'));renderPreview($('sPreview'),previewCode);}toast(`${data.name} ran ${data.mode || 'HTML'}`);}});
 socket.on('student-activity',data=>{const student=allStudents.find(s=>s.socketId===data.socketId); if(student){student.language=data.language;student.lastActivity=data.lastActivity;renderStudents();}});
+socket.on('teacher-run',()=>{});
 socket.on('student-left',({socketId})=>{studentCache.delete(socketId);allStudents=allStudents.filter(s=>s.socketId!==socketId);renderStudents();if(selectedStudentId===socketId){selectedStudentId='';$('monitorContent').classList.add('hidden');$('monitorEmpty').classList.remove('hidden');}toast('Student disconnected');});
 attachConsole($('tPreview'),$('tConsole'));

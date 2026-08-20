@@ -139,6 +139,7 @@ io.on("connection", socket => {
       classTitle: room.title,
       locked: room.locked,
       teacherCode:room.teacher.code,
+      teacherLastRun: room.teacher.lastRun,
       myCode:room.students.get(socket.id).code
     });
   });
@@ -149,8 +150,16 @@ io.on("connection", socket => {
     room.teacher.code = cleanCode(code);
     socket.to(socket.data.roomId).emit("teacher-code-update", {
       teacherName: room.teacher.name,
-      code: room.teacher.code
+      code: room.teacher.code,
+      lastRun: room.teacher.lastRun
     });
+  });
+
+  socket.on("teacher-run", ({html, css, js, mode = "html", output = [], runVersion} = {}) => {
+    const room = rooms.get(socket.data.roomId);
+    if (!room || socket.data.role !== "teacher" || room.teacher.socketId !== socket.id) return;
+    room.teacher.lastRun = { html: String(html ?? "").slice(0, 250000), css: String(css ?? "").slice(0, 250000), js: String(js ?? "").slice(0, 250000), mode: ["html", "css", "js"].includes(mode) ? mode : "html", output: Array.isArray(output) ? output.slice(0, 200) : [], runVersion: Number(runVersion) || Date.now() };
+    socket.to(socket.data.roomId).emit("teacher-run", { teacherName: room.teacher.name, ...room.teacher.lastRun });
   });
 
   socket.on("student-code-update", ({code} = {}) => {

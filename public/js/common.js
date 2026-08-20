@@ -72,6 +72,22 @@ function clearConsole(output) {
   if (output) output.innerHTML = '<div class="console-empty">No output yet.</div>';
 }
 
+function renderCapturedOutput(output, entries = []) {
+  if (!output) return;
+  clearConsole(output);
+  if (!entries.length) return;
+  output.innerHTML = '';
+  entries.forEach(entry => {
+    const line = document.createElement('div');
+    const level = entry?.level || 'log';
+    const prefix = level === 'error' ? '✕' : level === 'warn' ? '⚠' : level === 'info' ? 'ⓘ' : '>';
+    line.className = `console-line ${level}`;
+    line.textContent = `${prefix} ${(entry.args || []).join(' ')}`;
+    output.appendChild(line);
+  });
+  output.scrollTop = output.scrollHeight;
+}
+
 function attachConsole(iframe, output, onOutput = () => {}) {
   if (!iframe || !output) return;
   if (iframe.__consoleHandler) window.removeEventListener("message", iframe.__consoleHandler);
