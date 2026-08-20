@@ -7,7 +7,7 @@ try { require("dotenv").config(); } catch { /* dotenv is optional for local fall
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { maxHttpBufferSize: 1e6 });
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 9001;
 
 app.use(express.static(path.join(__dirname, "public")));
 app.get("/teacher", (_, res) => res.sendFile(path.join(__dirname, "public", "teacher.html")));
