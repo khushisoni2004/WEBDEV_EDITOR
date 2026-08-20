@@ -133,7 +133,20 @@ io.on("connection", socket => {
     }
 
     if (!name) return ack({ok:false, message:"Please enter your name."});
-    if (!room) return ack({ok:false, message:"No live classroom is open yet. Ask your teacher to create the class first."});
+    if (!room) {
+      socket.data.role = "practice-student";
+      return ack({
+        ok:true,
+        roomId:"PRACTICE",
+        teacherName:"Practice mode",
+        classTitle:"Personal Practice",
+        practiceOnly:true,
+        locked:false,
+        teacherCode:starterCode(),
+        teacherLastRun:null,
+        myCode:starterCode()
+      });
+    }
     if (!connectedTeacher(room)) {
       rooms.delete(id);
       return ack({ok:false, message:"Teacher is not connected."});

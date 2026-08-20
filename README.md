@@ -14,7 +14,7 @@ Real-time HTML, CSS and JavaScript classroom compiler for teachers and students.
 
 - Teacher-created rooms with shareable codes
 - Teacher password protection (`CODEPATH` by default)
-- Students join the active classroom using only their name
+- Students join using only their name; without a live teacher they receive a personal practice workspace
 - Separate HTML, CSS and JavaScript editors
 - Instant sandboxed browser preview and console output
 - Live teacher code broadcast to all students
@@ -47,7 +47,7 @@ PORT=9001
 ## Classroom Test
 
 1. Open Teacher and enter the teacher password `CODEPATH`.
-2. Create a classroom and share the Student page link.
+2. Create a classroom and share the Student page link. Students can also use the page for personal practice when no class is live.
 3. Open Student in another browser or phone.
 4. Join using only the student's name.
 5. Type code and click **Run** to test live sync and output.
