@@ -33,5 +33,15 @@
     </div>
   </section>
 </main>
+<script>
+  fetch('/api/config')
+    .then(res => res.json())
+    .then(config => {
+      if (config.BACKEND_URL) {
+        fetch(config.BACKEND_URL + '/health').catch(() => {});
+      }
+    })
+    .catch(() => {});
+</script>
 </body>
 </html>
