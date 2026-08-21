@@ -3,6 +3,6 @@
   "rewrites": [
     { "source": "/teacher", "destination": "/teacher.html" },
     { "source": "/student", "destination": "/student.html" },
-    { "source": "/socket.io/:path*", "destination": "https://codepath-livelab-production.up.railway.app/socket.io/:path*" }
+    { "source": "/socket.io/(.*)", "destination": "https://codepath-livelab-production.up.railway.app/socket.io/$1" }
   ]
 }
