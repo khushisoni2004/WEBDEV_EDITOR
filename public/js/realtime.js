@@ -32,8 +32,8 @@
   function attachSocket() {
     if (typeof window.io !== "function") return;
     liveSocket = window.io(window.BACKEND_URL, {
-      transports: ["polling", "websocket"],
-      upgrade: true,
+      transports: ["polling"],
+      upgrade: false,
       timeout: 15000,
       reconnection: true,
       reconnectionAttempts: Infinity,
