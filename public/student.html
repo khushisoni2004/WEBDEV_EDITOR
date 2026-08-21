@@ -54,7 +54,12 @@
 
   <section id="teacherView" class="view">
     <div class="toolbar"><div><b id="teacherTitle">Teacher Live Code</b><small>Read-only — updates automatically while teacher types</small></div><span class="badge online">Watching live</span></div>
-    <div class="code-workspace">
+    <div class="code-workspace" style="position: relative;">
+      <div id="teacherOfflineOverlay" class="empty big" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--panel); z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 0 0 14px 14px; text-align: center;">
+        <span style="font-size: 3rem; margin-bottom: 10px;">🎓</span>
+        <h2>No live code yet</h2>
+        <p style="max-width: 400px; margin: 0 auto; color: var(--muted); line-height: 1.5;">The teacher has not started writing code yet. As soon as the teacher types, the code will appear here live.</p>
+      </div>
       <section class="editor-card">
         <div class="code-tabs">
           <button class="code-tab active" data-group="teacherwatch" data-lang="html">HTML</button>
