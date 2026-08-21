@@ -20,6 +20,11 @@ app.use(express.static(path.join(__dirname, "public")));
 app.get("/teacher", (_, res) => res.sendFile(path.join(__dirname, "public", "teacher.html")));
 app.get("/student", (_, res) => res.sendFile(path.join(__dirname, "public", "student.html")));
 app.get("/health", (_, res) => res.json({ ok: true, rooms: rooms.size }));
+app.get("/api/config", (_, res) => {
+  res.json({
+    BACKEND_URL: (process.env.BACKEND_URL || "").trim()
+  });
+});
 
 const rooms = new Map();
 let activeRoomId = "";

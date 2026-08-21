@@ -78,7 +78,7 @@
   fetch('/api/config')
     .then(res => res.json())
     .then(config => {
-      window.BACKEND_URL = config.BACKEND_URL || "";
+      window.BACKEND_URL = (config.BACKEND_URL || "").trim();
     })
     .catch(err => {
       console.warn("Failed to load config, defaulting to local origin:", err);
