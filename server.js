@@ -30,27 +30,58 @@ const rooms = new Map();
 let activeRoomId = "";
 
 const starterCode = () => ({
-  html: `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LiveLab Workspace</title>
-</head>
-<body>
-  <h1>Welcome to my LiveLab</h1>
-  <p>Start editing this file to see live changes in the preview!</p>
-</body>
-</html>`,
-  css: `/* Write your CSS styles here */
+  html: `<!-- HTML Starter -->
+<div class="card">
+  <h1>CodePath LiveLab</h1>
+  <p>Practice HTML, CSS, and JS live!</p>
+  <button id="action-btn">Click Me</button>
+</div>`,
+  css: `/* CSS Starter */
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  padding: 20px;
-  background-color: #f9fafb;
-  color: #111827;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 350px;
+}
+
+h1 {
+  color: #10b981;
+  margin-top: 0;
+}
+
+button {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #059669;
 }`,
-  js: `// Write your JavaScript code here
-console.log('Script loaded successfully!');`
+  js: `// JS Starter
+const button = document.getElementById('action-btn');
+button.addEventListener('click', () => {
+  console.log('Hello from JavaScript!');
+  alert('Button clicked! Check the output console.');
+});`
 });
 
 function cleanCode(code = {}) {
