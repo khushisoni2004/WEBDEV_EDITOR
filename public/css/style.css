@@ -55,3 +55,37 @@ button{cursor:pointer}
 .console-empty{color:#64748b}.preview-card:not(.console-mode) .console{display:none}.preview-card.console-mode iframe{display:none}.preview-card.console-mode .console{display:block;height:calc(100% - 45px);min-height:520px;border-top:0;font-size:15px;padding:18px}.preview-card.console-mode .panel-head b::after{content:" · JavaScript Console";color:#94a3b8;font-weight:400}
 .logo-image{display:block;width:42px;height:42px;flex:0 0 42px;object-fit:cover;border-radius:13px;box-shadow:0 7px 18px #0004}.brand-hero .logo-image{width:96px;height:96px;flex-basis:96px;border-radius:28px;animation:logoFloat 5s ease-in-out infinite}.hero-top{display:flex;align-items:center;justify-content:space-between;gap:20px}.live-pill{display:inline-flex;align-items:center;gap:8px;border:1px solid #315b58;background:#103b3544;color:#86efac;padding:8px 12px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.08em}.live-pill i{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 16px #4ade80;animation:pulse 1.8s infinite}.hero h1 em{font-style:normal;background:linear-gradient(100deg,#c4b5fd,#60a5fa);background-clip:text;color:transparent}.hero-actions{display:flex;gap:12px;margin-top:28px}.hero-btn{font-weight:800;padding:13px 17px;min-width:170px}.hero-btn span{margin-left:8px;color:#c4b5fd}.feature-strip{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;color:#aebbd1;font-size:12px}.feature-strip span{padding:8px 11px;border:1px solid #2d3a58;border-radius:999px;background:#101a2caa}.ambient{position:fixed;pointer-events:none;border-radius:50%;filter:blur(2px);opacity:.7}.ambient-one{width:220px;height:220px;right:12%;top:8%;background:#6d28d933;animation:drift 8s ease-in-out infinite}.ambient-two{width:160px;height:160px;left:7%;bottom:12%;background:#2563eb2b;animation:drift 10s ease-in-out infinite reverse}@keyframes logoFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-7px) rotate(2deg)}}@keyframes pulse{50%{opacity:.35;transform:scale(.7)}}@keyframes drift{50%{transform:translate(22px,-18px) scale(1.12)}}
 @media(max-width:640px){.brand-hero .logo-image{width:72px;height:72px;flex-basis:72px;border-radius:21px}.hero-top{align-items:flex-start}.hero-top .live-pill{font-size:9px;padding:7px 8px}.hero-actions{display:grid;grid-template-columns:1fr}.hero-btn{width:100%}.feature-strip{gap:6px}.feature-strip span{font-size:10px}.topbar .logo-image{width:34px;height:34px;flex-basis:34px;border-radius:9px}}
+
+.symbol-bar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  background: #0b1120;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.symbol-bar::-webkit-scrollbar {
+  display: none;
+}
+.sym-btn {
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  background: #1e293b;
+  color: var(--text);
+  font-family: monospace;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+.sym-btn:hover {
+  background: #334155;
+  border-color: #475569;
+}
+.sym-btn:active {
+  background: #475569;
+}

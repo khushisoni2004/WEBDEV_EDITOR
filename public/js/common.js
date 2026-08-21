@@ -231,3 +231,32 @@ document.querySelectorAll("textarea.editor").forEach(editor => editor.addEventLi
   editor.value = editor.value.slice(0, start) + "  " + editor.value.slice(editor.selectionEnd);
   editor.selectionStart = editor.selectionEnd = start + 2; editor.dispatchEvent(new Event("input", {bubbles:true}));
 }));
+
+function insertSymbol(textarea, symbol) {
+  if (!textarea) return;
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const text = textarea.value;
+  textarea.value = text.slice(0, start) + symbol + text.slice(end);
+  textarea.selectionStart = textarea.selectionEnd = start + symbol.length;
+  textarea.focus();
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function initSymbolBars() {
+  document.querySelectorAll(".symbol-bar").forEach(bar => {
+    bar.querySelectorAll(".sym-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const card = bar.closest(".editor-card");
+        if (!card) return;
+        const activeTextarea = card.querySelector("textarea.editor.active");
+        if (activeTextarea) {
+          insertSymbol(activeTextarea, btn.dataset.sym || btn.textContent);
+        }
+      });
+    });
+  });
+}
+
+initSymbolBars();
