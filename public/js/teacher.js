@@ -46,8 +46,30 @@ function renderStudents() { const query=$('studentSearch').value.toLowerCase(); 
 function selectStudent(id) { selectedStudentId=id; const cached=studentCache.get(id); if(cached) showSelected(id,cached.name,cached.code,cached.lastRun); socket.emit('request-student-code',{socketId:id},res=>{ if(!res?.ok) return toast('Student is no longer connected.'); studentCache.set(id,res); showSelected(id,res.name,res.code,res.lastRun); }); }
 function showSelected(id,name,code,lastRun) { if(id!==selectedStudentId) return; $('monitorEmpty').classList.add('hidden'); $('monitorContent').classList.remove('hidden'); $('selectedName').textContent=`${name} Workspace`; setStudentCode(code); if(lastRun) { const previewCode=modeCode(lastRun,lastRun.mode || 'html'); if(lastRun.mode === 'js') runCode($('sPreview'),$('sConsole'),previewCode); else renderPreview($('sPreview'),previewCode); } renderStudents(); }
 function escapeHtml(text){return String(text).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));}
-socket.on('connect',()=>{ $('connection').textContent='● LIVE'; $('connection').className='badge online'; const errorEl=$('startError'); if(errorEl) errorEl.textContent=''; });
-socket.on('disconnect',()=>{ $('connection').textContent='Reconnecting'; $('connection').className='badge offline'; });
+socket.on('connect',()=>{
+  $('connection').textContent='● LIVE';
+  $('connection').className='badge online';
+  const errorEl=$('startError');
+  if(errorEl) errorEl.textContent='';
+  if($('modalConnectionState')){$('modalConnectionState').textContent='Connected';$('modalConnectionState').style.color='#86efac';}
+  if (roomId) {
+    socket.emit('rejoin-teacher', {roomId, password: $('teacherPassword').value || 'CODEPATH'}, res => {
+      if (res?.ok) {
+        toast('Reconnected to classroom');
+        setTeacherCode(res.teacherCode);
+        allStudents = res.students || [];
+        renderStudents();
+      } else {
+        roomId = "";
+        $('roomCode').textContent = "------";
+        $('startModal').style.display = 'grid';
+        toast('Room expired. Please start a new class.');
+      }
+    });
+  }
+});
+socket.on('disconnect',()=>{ $('connection').textContent='Reconnecting'; $('connection').className='badge offline'; if($('modalConnectionState')){$('modalConnectionState').textContent='Disconnected';$('modalConnectionState').style.color='#fca5a5';} });
+socket.on('connect_error',(err)=>{if($('modalConnectionState')){$('modalConnectionState').textContent='Error: '+err.message;$('modalConnectionState').style.color='#fca5a5';}});
 socket.on('student-list',list=>{allStudents=list; renderStudents();});
 socket.on('student-code-update',data=>{const previous=studentCache.get(data.socketId)||{};studentCache.set(data.socketId,{...previous,name:data.name,code:data.code,lastRun:data.lastRun||previous.lastRun}); if(data.socketId===selectedStudentId) showSelected(data.socketId,data.name,data.code,data.lastRun||previous.lastRun);});
 socket.on('student-code-change',data=>{const previous=studentCache.get(data.socketId)||{name:data.name,code:{html:'',css:'',js:''}};const code={...previous.code,[data.language]:data.code};studentCache.set(data.socketId,{...previous,name:data.name,code});if(data.socketId===selectedStudentId){setStudentCode(code);$('selectedName').textContent=`${data.name} Workspace · ${data.language.toUpperCase()} typing`;}});

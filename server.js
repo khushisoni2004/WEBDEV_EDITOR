@@ -147,6 +147,28 @@ io.on("connection", socket => {
     });
   });
 
+  socket.on("rejoin-teacher", ({roomId, password} = {}, ack = () => {}) => {
+    const id = String(roomId || "").trim().toUpperCase();
+    const room = rooms.get(id);
+    if (!room) return ack({ok:false, message:"Room not found."});
+    if (String(password || "").trim().toUpperCase() !== TEACHER_PASSWORD.toUpperCase()) {
+      return ack({ok:false, message:"Incorrect password."});
+    }
+    if (room.disconnectTimeout) {
+      clearTimeout(room.disconnectTimeout);
+      room.disconnectTimeout = null;
+    }
+    room.teacher.socketId = socket.id;
+    socket.join(id);
+    socket.data.role = "teacher";
+    socket.data.roomId = id;
+    ack({
+      ok: true,
+      teacherCode: room.teacher.code,
+      students: studentsFor(room)
+    });
+  });
+
   socket.on("join-student", ({roomId, studentName} = {}, ack = () => {}) => {
     let id = String(roomId || "").trim().toUpperCase();
     const name = String(studentName || "").trim().slice(0, 40);
@@ -314,9 +336,11 @@ io.on("connection", socket => {
     if (!room) return;
 
     if (socket.data.role === "teacher" && room.teacher.socketId === socket.id) {
-      io.to(socket.data.roomId).emit("room-closed", {message:"Teacher left the live room."});
-      rooms.delete(socket.data.roomId);
-      if (activeRoomId === socket.data.roomId) activeRoomId = "";
+      room.disconnectTimeout = setTimeout(() => {
+        io.to(socket.data.roomId).emit("room-closed", {message:"Teacher left the live room."});
+        rooms.delete(socket.data.roomId);
+        if (activeRoomId === socket.data.roomId) activeRoomId = "";
+      }, 30000);
       return;
     }
 

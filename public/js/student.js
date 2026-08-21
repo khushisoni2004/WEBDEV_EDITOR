@@ -27,7 +27,8 @@ socket.on('practice-lock',({locked:value})=>{locked=value;Object.values(mine).fo
 socket.on('announcement',({message})=>toast('Teacher: '+message));
 socket.on('teacher-focus',({focused})=>{if(focused){document.querySelector('[data-view="teacherView"]').click();toast('Teacher focus mode is on');}});
 socket.on('room-closed',({message})=>{alert(message||'Live room ended.');location.href='/';});
-socket.on('connect',()=>{$('connection').textContent='● Connected';$('connection').className='badge online';$('joinError').textContent='';if($('practiceOfflineBtn'))$('practiceOfflineBtn').style.display='none';});
-socket.on('disconnect',()=>{$('connection').textContent='Reconnecting';$('connection').className='badge offline';});
+socket.on('connect',()=>{$('connection').textContent='● Connected';$('connection').className='badge online';$('joinError').textContent='';if($('practiceOfflineBtn'))$('practiceOfflineBtn').style.display='none';if($('modalConnectionState')){$('modalConnectionState').textContent='Connected';$('modalConnectionState').style.color='#86efac';}if(roomId&&roomId!=='PRACTICE'&&$('studentName').value){socket.emit('join-student',{roomId,studentName:$('studentName').value},res=>{if(res?.ok){toast('Reconnected to classroom');}});}});
+socket.on('disconnect',()=>{$('connection').textContent='Reconnecting';$('connection').className='badge offline';if($('modalConnectionState')){$('modalConnectionState').textContent='Disconnected';$('modalConnectionState').style.color='#fca5a5';}});
+socket.on('connect_error',(err)=>{if($('modalConnectionState')){$('modalConnectionState').textContent='Error: '+err.message;$('modalConnectionState').style.color='#fca5a5';}});
 attachConsole($('mPreview'),$('mConsole'));
 setTimeout(()=>{if(!socket.connected&&$('practiceOfflineBtn'))$('practiceOfflineBtn').style.display='block';},1500);
