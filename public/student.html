@@ -98,20 +98,10 @@
 <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 <script src="/js/common.js"></script>
 <script>
-  window.BACKEND_URL = "";
-  fetch('/api/config')
-    .then(res => res.json())
-    .then(config => {
-      window.BACKEND_URL = (config.BACKEND_URL || "").trim();
-    })
-    .catch(err => {
-      console.warn("Failed to load config, defaulting to local origin:", err);
-    })
-    .finally(() => {
-      const script = document.createElement('script');
-      script.src = '/js/student.js';
-      document.body.appendChild(script);
-    });
+  window.BACKEND_URL = "https://codepath-livelab-production.up.railway.app";
+  const script = document.createElement('script');
+  script.src = '/js/student.js';
+  document.body.appendChild(script);
 </script>
 </body>
 </html>
