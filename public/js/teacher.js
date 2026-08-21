@@ -1,4 +1,4 @@
-const socket = io(window.BACKEND_URL || undefined);
+const socket = typeof io !== 'undefined' ? io(window.BACKEND_URL || undefined) : { connected: false, on: () => {}, emit: () => {} };
 let roomId = "", selectedStudentId = "", allStudents = [], focused = false;
 const $ = id => document.getElementById(id);
 const teacherEditors = {html:$('tHtml'), css:$('tCss'), js:$('tJs')};
