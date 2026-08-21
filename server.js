@@ -13,9 +13,18 @@ const server = http.createServer(app);
 const io = new Server(server, {
   maxHttpBufferSize: 1e6,
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
+    origin: (origin, callback) => callback(null, true),
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+    credentials: false
+  },
+  allowRequest: (_request, callback) => callback(null, true)
+});
+
+io.engine.on("headers", (headers, request) => {
+  headers["Access-Control-Allow-Origin"] = request.headers.origin || "*";
+  headers["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS";
+  headers["Access-Control-Allow-Headers"] = "Content-Type";
 });
 const PORT = process.env.PORT || 9001;
 const TEACHER_PASSWORD = process.env.TEACHER_PASSWORD || "CODEPATH";
