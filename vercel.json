@@ -2,6 +2,7 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/teacher", "destination": "/teacher.html" },
-    { "source": "/student", "destination": "/student.html" }
+    { "source": "/student", "destination": "/student.html" },
+    { "source": "/socket.io/:path*", "destination": "https://codepath-livelab-production.up.railway.app/socket.io/:path*" }
   ]
 }
