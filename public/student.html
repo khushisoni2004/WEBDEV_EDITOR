@@ -13,7 +13,7 @@
     <h1>Join live classroom</h1>
     <p>Enter your name to start coding immediately. If a teacher has an active class, you will join it automatically.</p>
     <label>Your name<input id="studentName" maxlength="40" placeholder="e.g. Aman Sharma" required></label>
-    <input id="roomInput" type="hidden" value="">
+    <label>Room Code <small>(Leave blank for practice or auto-join)</small><input id="roomInput" class="room-input" maxlength="6" placeholder="e.g. ABCDEF" style="text-transform: uppercase; letter-spacing: 0.15em; font-weight: bold;"></label>
     <button class="btn primary full" type="submit">Join Live Class</button>
     <button id="practiceOfflineBtn" type="button" class="btn ghost full" style="margin-top: 10px; display: none;">Start Practice Offline</button>
     <div id="joinError" class="error"></div>
