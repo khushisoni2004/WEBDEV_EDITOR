@@ -4,10 +4,10 @@ Real-time HTML, CSS and JavaScript classroom compiler for teachers and students.
 
 ## Live App
 
-- **Home:** https://codepath-livelab-production.up.railway.app
-- **Teacher:** https://codepath-livelab-production.up.railway.app/teacher
-- **Student:** https://codepath-livelab-production.up.railway.app/student
-- **Health:** https://codepath-livelab-production.up.railway.app/health
+- **Home:** https://webdev-editor.vercel.app
+- **Teacher:** https://webdev-editor.vercel.app/teacher
+- **Student:** https://webdev-editor.vercel.app/student
+- **Backend/Health:** https://webdev-editor.onrender.com/health
 - **GitHub:** https://github.com/khushisoni2004/WEBDEV_EDITOR
 
 ## Features
