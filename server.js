@@ -6,7 +6,13 @@ try { require("dotenv").config(); } catch { /* dotenv is optional for local fall
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { maxHttpBufferSize: 1e6 });
+const io = new Server(server, {
+  maxHttpBufferSize: 1e6,
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 const PORT = process.env.PORT || 9001;
 const TEACHER_PASSWORD = process.env.TEACHER_PASSWORD || "CODEPATH";
 

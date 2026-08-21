@@ -1,4 +1,4 @@
-const socket=io(); const $=id=>document.getElementById(id); let roomId='', locked=false;
+const socket=io(window.BACKEND_URL || undefined); const $=id=>document.getElementById(id); let roomId='', locked=false;
 const mine={html:$('mHtml'),css:$('mCss'),js:$('mJs')}; const watch={html:$('wHtml'),css:$('wCss'),js:$('wJs')};
 const mineCode=()=>Object.fromEntries(Object.entries(mine).map(([key,el])=>[key,el.value]));
 function setMine(code, render=true){Object.entries(mine).forEach(([key,el])=>el.value=code[key]||'');if(render)renderPreview($('mPreview'),code);}

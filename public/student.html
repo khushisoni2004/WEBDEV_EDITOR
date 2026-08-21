@@ -71,8 +71,23 @@
 </main>
 
 <div id="toast" class="toast"></div>
-<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 <script src="/js/common.js"></script>
-<script src="/js/student.js"></script>
+<script>
+  window.BACKEND_URL = "";
+  fetch('/api/config')
+    .then(res => res.json())
+    .then(config => {
+      window.BACKEND_URL = config.BACKEND_URL || "";
+    })
+    .catch(err => {
+      console.warn("Failed to load config, defaulting to local origin:", err);
+    })
+    .finally(() => {
+      const script = document.createElement('script');
+      script.src = '/js/student.js';
+      document.body.appendChild(script);
+    });
+</script>
 </body>
 </html>

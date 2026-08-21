@@ -1,4 +1,4 @@
-const socket = io();
+const socket = io(window.BACKEND_URL || undefined);
 let roomId = "", selectedStudentId = "", allStudents = [], focused = false;
 const $ = id => document.getElementById(id);
 const teacherEditors = {html:$('tHtml'), css:$('tCss'), js:$('tJs')};
