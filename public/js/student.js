@@ -1,4 +1,4 @@
-const socket = typeof io !== 'undefined' ? io(window.BACKEND_URL || undefined, { transports: ['websocket', 'polling'], timeout: 15000, reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000, reconnectionDelayMax: 5000 }) : { connected: false, on: () => {}, emit: () => {} }; const $=id=>document.getElementById(id); let roomId='', locked=false;
+const socket = window.createClassroomSocket(); const $=id=>document.getElementById(id); let roomId='', locked=false;
 const mine={html:$('mHtml'),css:$('mCss'),js:$('mJs')}; const watch={html:$('wHtml'),css:$('wCss'),js:$('wJs')};
 const mineCode=()=>Object.fromEntries(Object.entries(mine).map(([key,el])=>[key,el.value]));
 function setMine(code, render=true){Object.entries(mine).forEach(([key,el])=>el.value=code[key]||'');if(render)renderPreview($('mPreview'),code);}
