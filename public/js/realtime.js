@@ -32,7 +32,8 @@
   function attachSocket() {
     if (typeof window.io !== "function") return;
     liveSocket = window.io(window.BACKEND_URL, {
-      transports: ["websocket", "polling"],
+      transports: ["polling", "websocket"],
+      upgrade: true,
       timeout: 15000,
       reconnection: true,
       reconnectionAttempts: Infinity,
@@ -48,7 +49,7 @@
   window.createClassroomSocket = () => client;
 
   const loader = document.createElement("script");
-  loader.src = `${window.BACKEND_URL}/socket.io/socket.io.js`;
+  loader.src = "/js/socket.io.min.js";
   loader.async = true;
   loader.onload = attachSocket;
   loader.onerror = () => {

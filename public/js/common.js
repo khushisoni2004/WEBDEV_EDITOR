@@ -17,6 +17,7 @@ function buildDocument(code) {
   const interceptor = `<script>
 const parentOrigin = "*";
 const original = { log: console.log, warn: console.warn, error: console.error, info: console.info };
+window.Console = console;
 ["log", "warn", "error", "info"].forEach(level => {
   console[level] = (...args) => {
     original[level](...args);
