@@ -1,4 +1,4 @@
-const socket = window.createClassroomSocket(); const $=id=>document.getElementById(id); let roomId='', locked=false;
+const socket = window.createClassroomSocket(); const $=id=>document.getElementById(id); let roomId='', locked=false, pendingStudentName='', joinedLiveClass=false, joinRetryTimer=null;
 const mine={html:$('mHtml'),css:$('mCss'),js:$('mJs')}; const watch={html:$('wHtml'),css:$('wCss'),js:$('wJs')};
 const mineCode=()=>Object.fromEntries(Object.entries(mine).map(([key,el])=>[key,el.value]));
 function setMine(code, render=true){Object.entries(mine).forEach(([key,el])=>el.value=code[key]||'');if(render)renderPreview($('mPreview'),code);}
@@ -28,35 +28,58 @@ function enterLocalPractice(name) {
   setTeacher(starter);
 }
 
+function scheduleLiveJoinRetry() {
+  clearTimeout(joinRetryTimer);
+  joinRetryTimer = setTimeout(() => {
+    if (pendingStudentName && socket.connected && !joinedLiveClass) joinLiveClass(pendingStudentName);
+  }, 8000);
+}
+
+function joinLiveClass(name) {
+  socket.emit('join-student',{roomId:'',studentName:name},res=>{
+    if(res?.ok){
+      roomId=res.roomId;
+      joinedLiveClass=!res.practiceOnly;
+      $('roomCode').textContent=res.practiceOnly?'PRACTICE':roomId;
+      $('teacherInfo').textContent=res.practiceOnly?'Looking for an active teacher class…':'Teacher: '+res.teacherName;
+      $('teacherTitle').textContent=res.practiceOnly?'Personal Practice':res.teacherName+' — Live Code';
+      const saved=JSON.parse(safeStorage.getItem(`codelab:${roomId}`)||'null');
+      const isEmptyDraft=!saved||(!saved.html?.trim()&&!saved.css?.trim()&&!saved.js?.trim());
+      setMine(isEmptyDraft?res.myCode:saved);
+      setTeacher(res.teacherCode);
+      if(res.teacherLastRun?.mode==='js')renderCapturedOutput($('wConsole'),res.teacherLastRun.output);
+      if(res.practiceOnly){
+        scheduleLiveJoinRetry();
+      }else{
+        clearTimeout(joinRetryTimer);
+        toast('Joined classroom successfully');
+      }
+    }else{
+      enterLocalPractice(name);
+      scheduleLiveJoinRetry();
+    }
+  });
+}
+
 $('joinForm').onsubmit=e=>{
   e.preventDefault();
   const name = $('studentName').value.trim();
   if(!name) return;
 
+  pendingStudentName=name;
   $('joinModal').style.display='none';
-  const codeToJoin = $('roomInput').value.trim().toUpperCase();
-
   if(socket.connected){
-    socket.emit('join-student',{roomId:codeToJoin,studentName:name},res=>{
-      if(res?.ok){
-        roomId=res.roomId;
-        $('roomCode').textContent=res.practiceOnly?'PRACTICE':roomId;
-        $('teacherInfo').textContent=res.practiceOnly?'Personal practice — no teacher connected':'Teacher: '+res.teacherName;
-        $('teacherTitle').textContent=res.practiceOnly?'Personal Practice':res.teacherName+' — Live Code';
-        const saved=JSON.parse(safeStorage.getItem(`codelab:${roomId}`)||'null');
-        const isEmptyDraft=!saved||(!saved.html?.trim()&&!saved.css?.trim()&&!saved.js?.trim());
-        setMine(isEmptyDraft?res.myCode:saved);
-        setTeacher(res.teacherCode);
-        if(res.teacherLastRun?.mode==='js')renderCapturedOutput($('wConsole'),res.teacherLastRun.output);
-        toast(res.practiceOnly?'Practice workspace ready':'Joined classroom successfully');
-      }else{
-        enterLocalPractice(name);
-        toast(res?.message||'Entered practice mode');
-      }
-    });
+    joinLiveClass(name);
   }else{
-    enterLocalPractice(name);
-    toast('Practice workspace ready (Offline)');
+    $('roomCode').textContent='JOINING';
+    $('teacherInfo').textContent='Connecting to your live teacher…';
+    toast('Connecting to live classroom…');
+    setTimeout(()=>{
+      if(!socket.connected && pendingStudentName===name){
+        enterLocalPractice(name);
+        scheduleLiveJoinRetry();
+      }
+    },20000);
   }
 };
 
@@ -74,26 +97,10 @@ socket.on('connect',()=>{
   $('connection').textContent='● Connected';
   $('connection').className='badge online';
   if($('modalConnectionState')){$('modalConnectionState').textContent='Connected';$('modalConnectionState').style.color='#86efac';}
-  const name = $('studentName').value.trim();
-  if(name){
-    const codeToJoin = $('roomInput').value.trim().toUpperCase() || roomId;
-    const targetRoom = (codeToJoin === 'PRACTICE') ? '' : codeToJoin;
-    socket.emit('join-student',{roomId:targetRoom,studentName:name},res=>{
-      if(res?.ok){
-        roomId=res.roomId;
-        $('roomCode').textContent=res.practiceOnly?'PRACTICE':roomId;
-        $('teacherInfo').textContent=res.practiceOnly?'Personal practice — no teacher connected':'Teacher: '+res.teacherName;
-        $('teacherTitle').textContent=res.practiceOnly?'Personal Practice':res.teacherName+' — Live Code';
-        if(!res.practiceOnly){
-          setTeacher(res.teacherCode);
-          if(res.teacherLastRun?.mode==='js')renderCapturedOutput($('wConsole'),res.teacherLastRun.output);
-          toast('Connected to live classroom!');
-        }
-      }
-    });
-  }
+  const name = pendingStudentName || $('studentName').value.trim();
+  if(name && !joinedLiveClass) joinLiveClass(name);
 });
 
-socket.on('disconnect',()=>{$('connection').textContent='Reconnecting';$('connection').className='badge offline';if($('modalConnectionState')){$('modalConnectionState').textContent='Disconnected';$('modalConnectionState').style.color='#fca5a5';}});
+socket.on('disconnect',()=>{joinedLiveClass=false;$('connection').textContent='Reconnecting';$('connection').className='badge offline';if($('modalConnectionState')){$('modalConnectionState').textContent='Disconnected';$('modalConnectionState').style.color='#fca5a5';}});
 socket.on('connect_error',(err)=>{if($('modalConnectionState')){$('modalConnectionState').textContent='Error: '+err.message;$('modalConnectionState').style.color='#fca5a5';}});
 attachConsole($('mPreview'),$('mConsole'));
