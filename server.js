@@ -27,7 +27,7 @@ io.engine.on("headers", (headers, request) => {
   headers["Access-Control-Allow-Headers"] = "Content-Type";
 });
 const PORT = process.env.PORT || 9001;
-const TEACHER_PASSWORD = process.env.TEACHER_PASSWORD || "CODEPATH";
+const TEACHER_PASSWORD = process.env.TEACHER_PASSWORD || "";
 
 app.use(express.static(path.join(__dirname, "public")));
 app.get("/teacher", (_, res) => res.sendFile(path.join(__dirname, "public", "teacher.html")));
@@ -78,6 +78,9 @@ function studentsFor(room) {
 
 io.on("connection", socket => {
   socket.on("create-room", ({teacherName, classTitle, password} = {}, ack = () => {}) => {
+    if (!TEACHER_PASSWORD) {
+      return ack({ok:false, message:"Teacher password is not configured on the server."});
+    }
     if (String(password || "").trim().toUpperCase() !== TEACHER_PASSWORD.toUpperCase()) {
       return ack({ok:false, message:"Incorrect teacher password."});
     }
@@ -111,7 +114,7 @@ io.on("connection", socket => {
     const id = String(roomId || "").trim().toUpperCase();
     const room = rooms.get(id);
     if (!room) return ack({ok:false, message:"Room not found."});
-    if (String(password || "").trim().toUpperCase() !== TEACHER_PASSWORD.toUpperCase()) {
+    if (!TEACHER_PASSWORD || String(password || "").trim().toUpperCase() !== TEACHER_PASSWORD.toUpperCase()) {
       return ack({ok:false, message:"Incorrect password."});
     }
     if (room.disconnectTimeout) {

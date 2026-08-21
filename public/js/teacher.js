@@ -53,7 +53,7 @@ socket.on('connect',()=>{
   if(errorEl) errorEl.textContent='';
   if($('modalConnectionState')){$('modalConnectionState').textContent='Connected';$('modalConnectionState').style.color='#86efac';}
   if (roomId) {
-    socket.emit('rejoin-teacher', {roomId, password: $('teacherPassword').value || 'CODEPATH'}, res => {
+    socket.emit('rejoin-teacher', {roomId, password: $('teacherPassword').value}, res => {
       if (res?.ok) {
         toast('Reconnected to classroom');
         setTeacherCode(res.teacherCode);

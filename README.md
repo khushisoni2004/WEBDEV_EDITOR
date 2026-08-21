@@ -48,7 +48,7 @@ Teacher sees code live · Student clicks Run · Both see output
 ### Start a class
 
 1. Open the **Teacher Console**.
-2. Enter the teacher password: `CODEPATH`.
+2. Enter the teacher password shared privately by the classroom administrator.
 3. Create the live class.
 4. Send students the **Student Editor** link.
 5. Students enter their name and start coding from any phone, laptop, Wi‑Fi, or mobile data connection.
@@ -77,7 +77,7 @@ Create a `.env` file to change local settings:
 
 ```env
 PORT=9001
-TEACHER_PASSWORD=CODEPATH
+TEACHER_PASSWORD=choose-a-private-password
 ```
 
 ## 🔒 Safety by design
