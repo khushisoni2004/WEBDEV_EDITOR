@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "description": "Real-time HTML CSS JS classroom editor with teacher and student dashboards",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": "24.x"
   },
   "dependencies": {
     "express": "^5.1.0",

@@ -1,8 +1,12 @@
-const express = require("express");
-const http = require("http");
-const path = require("path");
-const { Server } = require("socket.io");
-try { require("dotenv").config(); } catch { /* dotenv is optional for local fallback */ }
+import express from "express";
+import http from "http";
+import path from "path";
+import { fileURLToPath } from "url";
+import { Server } from "socket.io";
+import dotenv from "dotenv";
+
+dotenv.config();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const server = http.createServer(app);
@@ -29,60 +33,7 @@ app.get("/api/config", (_, res) => {
 const rooms = new Map();
 let activeRoomId = "";
 
-const starterCode = () => ({
-  html: `<!-- HTML Starter -->
-<div class="card">
-  <h1>CodePath LiveLab</h1>
-  <p>Practice HTML, CSS, and JS live!</p>
-  <button id="action-btn">Click Me</button>
-</div>`,
-  css: `/* CSS Starter */
-body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  margin: 0;
-  background: #f3f4f6;
-  color: #1f2937;
-}
-
-.card {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  max-width: 350px;
-}
-
-h1 {
-  color: #10b981;
-  margin-top: 0;
-}
-
-button {
-  background: #10b981;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-button:hover {
-  background: #059669;
-}`,
-  js: `// JS Starter
-const button = document.getElementById('action-btn');
-button.addEventListener('click', () => {
-  console.log('Hello from JavaScript!');
-  alert('Button clicked! Check the output console.');
-});`
-});
+const starterCode = () => ({ html: "", css: "", js: "" });
 
 function cleanCode(code = {}) {
   return {
@@ -355,3 +306,5 @@ io.on("connection", socket => {
 server.listen(PORT, () => {
   console.log(`LiveCode Classroom: http://localhost:${PORT}`);
 });
+
+export default server;

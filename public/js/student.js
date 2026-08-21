@@ -16,8 +16,50 @@ $('runStudent').onclick=runStudentCode;
 $('clearStudentConsole').onclick=()=>clearConsole($('mConsole'));
 $('resetStudent').onclick=()=>{if(confirm('Reset your code? Your current changes will be removed.')){setMine(starter);sendMine();}};
 $('roomInput').oninput=e=>e.target.value=e.target.value.toUpperCase();
-$('joinForm').onsubmit=e=>{e.preventDefault();if(!socket.connected){$('joinError').textContent='Connecting to live server... Please wait a moment for the free server to wake up (takes 30-50s).';$('joinError').style.color='#b45309';if($('practiceOfflineBtn'))$('practiceOfflineBtn').style.display='block';return;}$('joinError').textContent='';socket.emit('join-student',{roomId:$('roomInput').value,studentName:$('studentName').value},res=>{if(!res?.ok){$('joinError').textContent=res?.message||'Unable to join classroom.';$('joinError').style.color='';return;}roomId=res.roomId;$('roomCode').textContent=res.practiceOnly?'PRACTICE':roomId;$('teacherInfo').textContent=res.practiceOnly?'Personal practice — no teacher connected':'Teacher: '+res.teacherName;$('teacherTitle').textContent=res.practiceOnly?'Personal Practice':res.teacherName+' — Live Code';const saved=JSON.parse(safeStorage.getItem(`codelab:${roomId}`)||'null');const isEmptyDraft=!saved||(!saved.html?.trim()&&!saved.css?.trim()&&!saved.js?.trim());setMine(isEmptyDraft?res.myCode:saved);setTeacher(res.teacherCode);if(res.teacherLastRun?.mode==='js')renderCapturedOutput($('wConsole'),res.teacherLastRun.output);$('joinModal').style.display='none';toast(res.practiceOnly?'Practice workspace ready':'Joined classroom successfully');});};
-$('practiceOfflineBtn').onclick=()=>{roomId='PRACTICE';$('roomCode').textContent='PRACTICE';$('teacherInfo').textContent='Personal practice — offline mode';$('teacherTitle').textContent='Personal Practice';const saved=JSON.parse(safeStorage.getItem(`codelab:${roomId}`)||'null');const isEmptyDraft=!saved||(!saved.html?.trim()&&!saved.css?.trim()&&!saved.js?.trim());setMine(isEmptyDraft?starter:saved);setTeacher(starter);$('joinModal').style.display='none';toast('Practice workspace ready (Offline)');};
+
+function enterLocalPractice(name) {
+  roomId = 'PRACTICE';
+  $('roomCode').textContent = 'PRACTICE';
+  $('teacherInfo').textContent = 'Personal practice — offline mode';
+  $('teacherTitle').textContent = 'Personal Practice';
+  const saved = JSON.parse(safeStorage.getItem(`codelab:${roomId}`) || 'null');
+  const isEmptyDraft = !saved || (!saved.html?.trim() && !saved.css?.trim() && !saved.js?.trim());
+  setMine(isEmptyDraft ? starter : saved);
+  setTeacher(starter);
+}
+
+$('joinForm').onsubmit=e=>{
+  e.preventDefault();
+  const name = $('studentName').value.trim();
+  if(!name) return;
+
+  $('joinModal').style.display='none';
+  const codeToJoin = $('roomInput').value.trim().toUpperCase();
+
+  if(socket.connected){
+    socket.emit('join-student',{roomId:codeToJoin,studentName:name},res=>{
+      if(res?.ok){
+        roomId=res.roomId;
+        $('roomCode').textContent=res.practiceOnly?'PRACTICE':roomId;
+        $('teacherInfo').textContent=res.practiceOnly?'Personal practice — no teacher connected':'Teacher: '+res.teacherName;
+        $('teacherTitle').textContent=res.practiceOnly?'Personal Practice':res.teacherName+' — Live Code';
+        const saved=JSON.parse(safeStorage.getItem(`codelab:${roomId}`)||'null');
+        const isEmptyDraft=!saved||(!saved.html?.trim()&&!saved.css?.trim()&&!saved.js?.trim());
+        setMine(isEmptyDraft?res.myCode:saved);
+        setTeacher(res.teacherCode);
+        if(res.teacherLastRun?.mode==='js')renderCapturedOutput($('wConsole'),res.teacherLastRun.output);
+        toast(res.practiceOnly?'Practice workspace ready':'Joined classroom successfully');
+      }else{
+        enterLocalPractice(name);
+        toast(res?.message||'Entered practice mode');
+      }
+    });
+  }else{
+    enterLocalPractice(name);
+    toast('Practice workspace ready (Offline)');
+  }
+};
+
 $('saveProject').onclick=()=>{persist();toast('Project saved locally');};
 $('downloadProject').onclick=()=>downloadProject(mineCode(),'student-project');
 $('leaveClass').onclick=()=>{if(confirm('Leave this classroom?'))location.href='/';};
@@ -27,8 +69,31 @@ socket.on('practice-lock',({locked:value})=>{locked=value;Object.values(mine).fo
 socket.on('announcement',({message})=>toast('Teacher: '+message));
 socket.on('teacher-focus',({focused})=>{if(focused){document.querySelector('[data-view="teacherView"]').click();toast('Teacher focus mode is on');}});
 socket.on('room-closed',({message})=>{alert(message||'Live room ended.');location.href='/';});
-socket.on('connect',()=>{$('connection').textContent='● Connected';$('connection').className='badge online';$('joinError').textContent='';if($('practiceOfflineBtn'))$('practiceOfflineBtn').style.display='none';if($('modalConnectionState')){$('modalConnectionState').textContent='Connected';$('modalConnectionState').style.color='#86efac';}if(roomId&&roomId!=='PRACTICE'&&$('studentName').value){socket.emit('join-student',{roomId,studentName:$('studentName').value},res=>{if(res?.ok){toast('Reconnected to classroom');}});}});
+
+socket.on('connect',()=>{
+  $('connection').textContent='● Connected';
+  $('connection').className='badge online';
+  if($('modalConnectionState')){$('modalConnectionState').textContent='Connected';$('modalConnectionState').style.color='#86efac';}
+  const name = $('studentName').value.trim();
+  if(name){
+    const codeToJoin = $('roomInput').value.trim().toUpperCase() || roomId;
+    const targetRoom = (codeToJoin === 'PRACTICE') ? '' : codeToJoin;
+    socket.emit('join-student',{roomId:targetRoom,studentName:name},res=>{
+      if(res?.ok){
+        roomId=res.roomId;
+        $('roomCode').textContent=res.practiceOnly?'PRACTICE':roomId;
+        $('teacherInfo').textContent=res.practiceOnly?'Personal practice — no teacher connected':'Teacher: '+res.teacherName;
+        $('teacherTitle').textContent=res.practiceOnly?'Personal Practice':res.teacherName+' — Live Code';
+        if(!res.practiceOnly){
+          setTeacher(res.teacherCode);
+          if(res.teacherLastRun?.mode==='js')renderCapturedOutput($('wConsole'),res.teacherLastRun.output);
+          toast('Connected to live classroom!');
+        }
+      }
+    });
+  }
+});
+
 socket.on('disconnect',()=>{$('connection').textContent='Reconnecting';$('connection').className='badge offline';if($('modalConnectionState')){$('modalConnectionState').textContent='Disconnected';$('modalConnectionState').style.color='#fca5a5';}});
 socket.on('connect_error',(err)=>{if($('modalConnectionState')){$('modalConnectionState').textContent='Error: '+err.message;$('modalConnectionState').style.color='#fca5a5';}});
 attachConsole($('mPreview'),$('mConsole'));
-setTimeout(()=>{if(!socket.connected&&$('practiceOfflineBtn'))$('practiceOfflineBtn').style.display='block';},1500);
